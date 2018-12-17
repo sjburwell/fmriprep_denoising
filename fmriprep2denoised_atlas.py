@@ -20,11 +20,10 @@ funcdat  = glob.glob(prepdir + '*/*/*/*/*bold_space-MNI152NLin2009cAsym_preproc.
 #atlas    = '/labs/burwellstudy/data/rois/Gordon2016+SubcortRL.nii'
 #atlas    = '/labs/burwellstudy/data/rois/Shirer2012.nii'
 #atlas    = '/labs/burwellstudy/apps/conn17f/conn/rois/atlas.nii'
-#atlas    = '/labs/burwellstudy/data/rois/Ray2013-ICA70.nii'
-atlas    = '/labs/burwellstudy/data/rois/Gordon2016+HarvOxSubCort.nii'
+atlas    = '/labs/burwellstudy/data/rois/Ray2013-ICA70.nii'
+#atlas    = '/labs/burwellstudy/data/rois/Gordon2016+HarvOxSubCort.nii'
 atlasis4d= True
-
-overwrite= False
+overwrite= True 
 
 from typing import NamedTuple
 class MyStruct(NamedTuple):
@@ -40,67 +39,80 @@ class MyStruct(NamedTuple):
     dvrthr:    float
 
 #for temporal filtering cosine functions, consider: https://nipype.readthedocs.io/en/latest/interfaces/generated/nipype.algorithms.confounds.html
-cosines = ["Cosine00","Cosine01","Cosine02","Cosine03","Cosine04","Cosine05","Cosine06","Cosine07"]
+baseregressors = ["Cosine*","NonSteadyStateOutlier*"]
 pipelines = (
-MyStruct(outid='00P',usearoma=False,n_init2drop=5,nonaggr=False,
+MyStruct(outid='00P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=[],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='01P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='01P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='02P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='02P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='03P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='03P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='06P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='06P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='24P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='24P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='09P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='09P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='36P',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='36P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='36P+SpkRegFD22SD99',usearoma=False,n_init2drop=5,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=1,fdthr=.22,dvrthr=99,addnoise=cosines),
-MyStruct(outid='03P+SpkRegFD-p2261',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='03P+SpkReg75thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=1,fdthr=.2261,dvrthr=99,addnoise=cosines),
-MyStruct(outid='03P+SpkRegFD-p2496',usearoma=False,n_init2drop=5,nonaggr=False,
+         spkreg=1,fdthr=0.2266,dvrthr=1.3992,addnoise=baseregressors),
+MyStruct(outid='03P+SpkReg80thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=1,fdthr=.2496,dvrthr=99,addnoise=cosines),
-MyStruct(outid='09P+SpkRegFD-p2261',usearoma=False,n_init2drop=5,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=1,fdthr=.2261,dvrthr=99,addnoise=cosines),
-MyStruct(outid='09P+SpkRegFD-p2496',usearoma=False,n_init2drop=5,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=1,fdthr=.2496,dvrthr=99,addnoise=cosines),
-MyStruct(outid='36P+SpkRegFD-p2261',usearoma=False,n_init2drop=5,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=1,fdthr=.2261,dvrthr=99,addnoise=cosines),
-MyStruct(outid='36P+SpkRegFD-p2496',usearoma=False,n_init2drop=5,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=1,fdthr=.2496,dvrthr=99,addnoise=cosines),
-MyStruct(outid='AROMANonAgg',usearoma=False,n_init2drop=5,nonaggr=True,
+         spkreg=1,fdthr=0.2501,dvrthr=1.4295,addnoise=baseregressors),
+MyStruct(outid='03P+SpkReg90thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+         spkreg=1,fdthr=0.3263,dvrthr=1.5138,addnoise=baseregressors),
+MyStruct(outid='09P+SpkReg75thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+         spkreg=1,fdthr=0.2266,dvrthr=1.3992,addnoise=baseregressors),
+MyStruct(outid='09P+SpkReg80thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+         spkreg=1,fdthr=0.2501,dvrthr=1.4295,addnoise=baseregressors),
+MyStruct(outid='09P+SpkReg90thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+         spkreg=1,fdthr=0.3263,dvrthr=1.5138,addnoise=baseregressors),
+MyStruct(outid='36P+SpkReg75thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
+         spkreg=1,fdthr=0.2266,dvrthr=1.3992,addnoise=baseregressors),
+MyStruct(outid='36P+SpkReg80thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
+         spkreg=1,fdthr=0.2501,dvrthr=1.4295,addnoise=baseregressors),
+MyStruct(outid='36P+SpkReg90thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
+         spkreg=1,fdthr=0.3263,dvrthr=1.5138,addnoise=baseregressors), 
+MyStruct(outid='aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=[],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='AROMANonAgg+01P',usearoma=False,n_init2drop=5,nonaggr=True,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+MyStruct(outid='24P+aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=2,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal'],expansion=2,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+MyStruct(outid='00P+AROMANonAgg',usearoma=False,n_init2drop=0,nonaggr=True,
+         noise=[],expansion=0,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='01P+AROMANonAgg',usearoma=False,n_init2drop=0,nonaggr=True,
          noise=['GlobalSignal'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='AROMANonAgg+02P',usearoma=False,n_init2drop=5,nonaggr=True,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='02P+AROMANonAgg',usearoma=False,n_init2drop=0,nonaggr=True,
          noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines),
-MyStruct(outid='AROMANonAgg+03P',usearoma=False,n_init2drop=5,nonaggr=True,
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='03P+AROMANonAgg',usearoma=False,n_init2drop=0,nonaggr=True,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=cosines) )
-
-
+         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors) )
 
 idnum       = np.zeros((len(funcdat),len(pipelines)))
 fdthr       = np.zeros((len(funcdat),len(pipelines)))
@@ -123,12 +135,11 @@ for ii in range(0,len(funcdat)):
     curaroma= glob.glob(curdir + '/*bold_space-MNI152NLin2009cAsym_variant-smoothAROMAnonaggr_preproc.nii.gz')[0]
     curcache= cachedir + '/' + os.path.basename(curfunc)[0:11]
     dim1,dim2,dim3,timepoints = load(curfunc, mmap=NUMPY_MMAP).shape
-    #curgmprb= glob.glob(curdir.split('ses-')[0] + 'anat/*_T1w_space-MNI152NLin2009cAsym_class-GM_probtissue.nii.gz')[0]
 
     if atlasis4d:
-       masker = NiftiLabelsMasker(labels_img=atlas, detrend=True, standardize=True, mask_img=curmask) #, smoothing_fwhm=6)
+       masker = NiftiMapsMasker(    maps_img=atlas, detrend=True, standardize=True, mask_img=curmask, smoothing_fwhm=6)
     else:
-       masker = NiftiMapsMasker(    maps_img=atlas, detrend=True, standardize=True, mask_img=curmask, smoothing_fwhm=6) 
+       masker = NiftiLabelsMasker(labels_img=atlas, detrend=True, standardize=True, mask_img=curmask)
 
     t = time.time()
     print ('Current subject (' + str(ii) + '): ' + curfunc)
@@ -152,51 +163,37 @@ for ii in range(0,len(funcdat)):
      fd_thresh    = pipelines[jj].fdthr
      dvar_thresh  = pipelines[jj].dvrthr
      
-     # maybe this check is unnecessary
-     if not pipelines[jj].usearoma:
-        noise     = pipelines[jj].noise
-     else:
-        noise     = pipelines[jj].noise                
-
-     #noise columns
-     if not noise:
-         NoiseReg   = np.ones(shape=(timepoints,1))
-     else:
-         if len(noise)==1:
-            NoiseReg = confounds[ [ col for col in list(confounds) if col.startswith(noise[0])]]
-         else:
-            NoiseReg = np.array(confounds[noise])
+     # 'noise' (derivs and expansions can be applied) and 'addnoise' (only 0th-lag and non-expanded allowed) columns
+     noise = pipelines[jj].noise
+     NoiseReg = np.ones(shape=(timepoints,1))
+     if len(noise)>0:
+        for kk in range(0,len(noise)):
+            NoiseReg = np.concatenate(( NoiseReg, confounds.filter(regex=noise[kk])),axis=1)
      if do_expansion is 1:
-        NoiseReg   = np.concatenate(( NoiseReg,np.concatenate(([np.zeros(NoiseReg.shape[1])],np.diff(NoiseReg,axis=0)),axis=0) ),axis=1)
+        NoiseReg  = np.concatenate(( NoiseReg,np.concatenate(([np.zeros(NoiseReg.shape[1])],np.diff(NoiseReg,axis=0)),axis=0) ),axis=1)
      if do_expansion is 2:
-        NoiseReg   = np.concatenate(( NoiseReg,np.concatenate(([np.zeros(NoiseReg.shape[1])],np.diff(NoiseReg,axis=0)),axis=0) ),axis=1)
-        NoiseReg   = np.concatenate( (NoiseReg,np.square(NoiseReg)), axis=1)
+        NoiseReg  = np.concatenate(( NoiseReg,np.concatenate(([np.zeros(NoiseReg.shape[1])],np.diff(NoiseReg,axis=0)),axis=0) ),axis=1)
+        NoiseReg  = np.concatenate( (NoiseReg,np.square(NoiseReg)),axis=1)
      if len(addnoise)>0:
-        NoiseReg   = np.concatenate(( NoiseReg,confounds[addnoise]),axis=1)
-
-     #replace NaNs w/ column means
-     col_mean = np.nanmean(NoiseReg,axis=0)
-     inds     = np.where(np.isnan(NoiseReg))
-     NoiseReg[inds] = np.take(col_mean,inds[1])
+        for kk in range(0,len(addnoise)):
+            NoiseReg = np.concatenate(( NoiseReg, confounds.filter(regex=addnoise[kk])),axis=1)
+     col_mean       = np.nanmean(NoiseReg,axis=0)   #\
+     inds           = np.where(np.isnan(NoiseReg))  # replace NaNs w/ column means
+     NoiseReg[inds] = np.take(col_mean,inds[1])     #/
 
      #spike columns - taken from another script, a bit kloogey
      SpikeReg = np.ones([timepoints,1])
-     dvarnormstd = (confounds["non-stdDVARS"] - np.nanmean(confounds["non-stdDVARS"])) / np.std(confounds["non-stdDVARS"])
-     dvarnormmad = 1.4826 * ((confounds["non-stdDVARS"] - np.nanmedian(confounds["non-stdDVARS"])) /  \
-                     np.mean( np.abs( confounds["non-stdDVARS"] - np.nanmedian(confounds["non-stdDVARS"]) ) ))
      if do_spikereg is 1:
-        SpikeReg = (((dvarnormstd > dvar_thresh) | (confounds.FramewiseDisplacement > fd_thresh))==False)*1
-     if do_spikereg is 2:
-        SpikeReg = (((dvarnormmad > dvar_thresh) | (confounds.FramewiseDisplacement > fd_thresh))==False)*1
-
-     SpikeReg[0:(n_init2drop)] = 0 
+        SpikeReg = (((confounds.stdDVARS > dvar_thresh) | (confounds.FramewiseDisplacement > fd_thresh))==False)*1
+     if n_init2drop>0:
+        SpikeReg[0:(n_init2drop)] = 0 
      censorcols   = np.where(SpikeReg==0)[0]
      SpikeCols    = np.zeros((NoiseReg.shape[0],len(censorcols)))
      SpikeCols[censorcols,range(0,len(censorcols))] = 1
      if len(np.where(SpikeReg==0)[0])>0:
         NoiseReg  = np.concatenate((NoiseReg,SpikeCols),axis=1)
 
-     #de-mean noise[/spike] matrix
+     #de-mean noise[/spike] matrix, delete columns of constants
      NoiseReg = NoiseReg - np.mean(NoiseReg,axis=0)
      if any (np.mean(NoiseReg,axis=0)==0): 
         NoiseReg = np.delete(NoiseReg,np.where(np.mean(NoiseReg,axis=0)==0)[0][0],1)
@@ -222,7 +219,7 @@ for ii in range(0,len(funcdat)):
         if not os.path.isfile(outfile) or overwrite: 
            print ('Non-aggressively regressing ' + str(len(freg.inputs.filter_columns)) + ' parameters from functional file, and extracting ROIs...')
            freg.run()
-           #THE ABOVE STEP SHOULD HAVE A LINEAR DETREND TOO!
+           #PERHAPS THE ABOVE STEP SHOULD HAVE A LINEAR DETREND TOO!
            
            #extract time-series
            roits = masker.fit_transform(freg.inputs.out_file)
