@@ -15,15 +15,14 @@ from nilearn.connectome import ConnectivityMeasure
 prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'
 cachedir = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/denoised'
 funcdat  = glob.glob(prepdir + '*/*/*/*/*bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
-#atlas    = '/labs/burwellstudy/data/rois/Gordon2016/Parcels_MNI_222.nii'
-#atlas    = '/labs/burwellstudy/data/rois/Power2011/Power_Neuron_264ROIs_Radius5_Mask.nii'
-#atlas    = '/labs/burwellstudy/data/rois/Gordon2016+SubcortRL.nii'
-#atlas    = '/labs/burwellstudy/data/rois/Shirer2012.nii'
-#atlas    = '/labs/burwellstudy/apps/conn17f/conn/rois/atlas.nii'
-atlas    = '/labs/burwellstudy/data/rois/Ray2013-ICA70.nii'
-#atlas    = '/labs/burwellstudy/data/rois/Gordon2016+HarvOxSubCort.nii'
-atlasis4d= True
-overwrite= True 
+#atlas    = './atlases/Parcels_MNI_222.nii'                       #atlasis4d should be False
+#atlas    = './atlases/Power_Neuron_264ROIs_Radius5_Mask.nii'     #atlasis4d should be False
+#atlas    = './atlases/Shirer2012.nii'                            #atlasis4d should be False
+#atlas    = './atlases/Conn17f_atlas.nii'                         #atlasis4d should be False
+atlas    = './atlases/Ray2013-ICA70.nii'                         #atlasis4d should be True
+#atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlasis4d should be False
+atlasis4d= True  #True (e.g., probabalistic atlas) or False (i.e., one volume, integer masks)
+overwrite= False #overwrite contents of "denoised/sub-????" directories
 
 from typing import NamedTuple
 class MyStruct(NamedTuple):
@@ -73,7 +72,7 @@ MyStruct(outid='03P+SpkReg80thPctile',usearoma=False,n_init2drop=0,nonaggr=False
          spkreg=1,fdthr=0.2501,dvrthr=1.4295,addnoise=baseregressors),
 MyStruct(outid='03P+SpkReg90thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=1,fdthr=0.3263,dvrthr=1.5138,addnoise=baseregressors),
+         spkreg=1,fdthr=0.3263,dvrthr=1.5138,addnoise=baseregressors), 
 MyStruct(outid='09P+SpkReg75thPctile',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
          spkreg=1,fdthr=0.2266,dvrthr=1.3992,addnoise=baseregressors),
