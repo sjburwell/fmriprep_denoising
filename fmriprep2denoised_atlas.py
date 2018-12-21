@@ -6,23 +6,28 @@ import numpy as np
 from scipy import signal
 from scipy.io import savemat
 from nibabel import load
-from nipype.utils import NUMPY_MMAP #for some reason, works on artemis, but not other machines
+from nipype.utils import NUMPY_MMAP                 #may only work on certain systems??
 from nilearn.input_data import NiftiLabelsMasker
 from nilearn.input_data import NiftiMapsMasker
 from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
 prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'
-cachedir = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/denoised'
-funcdat  = glob.glob(prepdir + '*/*/*/*/*bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
 #atlas    = './atlases/Parcels_MNI_222.nii'                       #atlasis4d should be False
 #atlas    = './atlases/Power_Neuron_264ROIs_Radius5_Mask.nii'     #atlasis4d should be False
 #atlas    = './atlases/Shirer2012.nii'                            #atlasis4d should be False
 #atlas    = './atlases/Conn17f_atlas.nii'                         #atlasis4d should be False
-atlas    = '/labs/burwellstudy/data/rois/Ray2013-ICA70.nii'      #atlasis4d should be True
-#atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlasis4d should be False
-atlasis4d= True  #True (e.g., probabalistic atlas) or False (i.e., one volume, integer masks)
+#atlas    = '/labs/burwellstudy/data/rois/Ray2013-ICA70.nii'      #atlasis4d should be True
+atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlasis4d should be False
 overwrite= False #overwrite contents of "denoised/sub-????" directories
+
+
+cachedir = prepdir+'/denoised'
+funcdat  = glob.glob(prepdir + '*/*/*/*/*bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
+if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
+   atlasis4d = True
+else:
+   atlasis4d = False
 
 from typing import NamedTuple
 class MyStruct(NamedTuple):
