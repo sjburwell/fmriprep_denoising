@@ -19,6 +19,12 @@ pipelines = [
 '09P',
 '24P',
 '36P',
+'03P+SpkReg80thPctileFD',
+'09P+SpkReg80thPctileFD',
+'36P+SpkReg80thPctileFD',
+'03P+SpkReg80thPctileDVARS',
+'09P+SpkReg80thPctileDVARS',
+'36P+SpkReg80thPctileDVARS',
 '03P+SpkReg80thPctile',
 '09P+SpkReg80thPctile',
 '36P+SpkReg80thPctile',
@@ -34,11 +40,12 @@ pipelines = [
 '02P+AROMAAgg',
 '03P+AROMAAgg']
 
+
 #these will be optional inputs
 atlas     = './atlases/Gordon2016+HarvOxSubCort.nii' #should save this to "allsubjdenoised" from fmriprep2denoised_atlas.py 349 nodes
 pthr      = .001                                     #p-criterion for quantifying edges (uncorrected)
 
-reconvers =['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
+reconvers =['syngo_MR_E11'] #['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
 centsv    = '00P' #or, pipelines[0]
 trpctbad  =   60
 badidlist = '/labs/burwellstudy/projects/twinness/scripts/esmf_poorquality.txt'
