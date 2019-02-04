@@ -1,17 +1,17 @@
 import glob
 import pandas as pd
 import numpy as np
-confounds = glob.glob('/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/*/*/*/*confounds.tsv')
+confounds = glob.glob('/home/syliaw/shared/bids/fmriprep_output/fmriprep/*/*/*/*confounds*.tsv')
 for ii in range(0,len(confounds)):
   curconf = pd.read_csv(confounds[ii],sep='\t')
   if ii==0:
-     allfd = curconf['FramewiseDisplacement'][1:-1]
+     allfd = curconf.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1]
   else:
-     allfd = pd.concat((allfd,curconf['FramewiseDisplacement'][1:-1]))
+     allfd = pd.concat((allfd,curconf.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1]))
 
-  tmp = curconf['stdDVARS'][1:-1]                     #standardized DVARS
-  #tmp = tmp - np.median(tmp)                         #median deviation
-  #tmp = tmp / (np.median(np.abs(tmp)) * 1.4826)      #norm. abs. deviation
+  tmp = curconf.filter(['stdDVARS','std_dvars'])[1:-1]  #standardized DVARS
+  #tmp = tmp - np.median(tmp)                           #median deviation
+  #tmp = tmp / (np.median(np.abs(tmp)) * 1.4826)        #norm. abs. deviation
   if ii==0:
      alldv = tmp
   else:
