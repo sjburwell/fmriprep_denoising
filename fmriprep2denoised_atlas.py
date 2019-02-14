@@ -7,13 +7,13 @@ from scipy import signal
 from scipy.io import savemat
 from nibabel import load
 from nipype.utils import NUMPY_MMAP                 #may only work on certain systems??
-from nilearn.input_data import NiftiLabelsMasker
+from nilearn.input_data import NiftiLabelsMasker    #nilearn may require this version-->  pip install nilearn==0.5.0a0
 from nilearn.input_data import NiftiMapsMasker
 from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
-prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'  #directory where fmriprep was computed
-atlas    = './atlases/Shirer2012.nii'                            #atlas from which to extract ROI time-series
+prepdir  = '/home/syliaw/shared/bids/fmriprep_output/fmriprep'   #directory where fmriprep was computed
+atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlas from which to extract ROI time-series
 overwrite= False                                                 #should overwrite contents of "denoised/sub-????" directories?
 
 

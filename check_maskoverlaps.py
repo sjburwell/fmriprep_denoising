@@ -3,8 +3,8 @@ import glob
 from scipy import ndimage as nd
 import nibabel as nib
 
-anatmasks = glob.glob('/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/*/*/*T1w_space*brainmask.nii.gz')    #these two columns should correspond 
-funcmasks = glob.glob('/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/*/*/*/*bold_space*brainmask.nii.gz') # to the same space (i.e., MNI-transformed)
+anatmasks = glob.glob('/home/syliaw/shared/bids/fmriprep_output/fmriprep/*/anat/*space*brain*mask.nii.gz')    #these two columns should correspond 
+funcmasks = glob.glob('/home/syliaw/shared/bids/fmriprep_output/fmriprep/*/*/func/*space*brain*mask.nii.gz') # to the same space (i.e., MNI-transformed)
 
 idlist   = np.zeros((len(anatmasks),1))
 overlaps = np.zeros((len(anatmasks),1))
