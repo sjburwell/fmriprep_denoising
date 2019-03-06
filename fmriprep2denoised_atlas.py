@@ -13,12 +13,13 @@ from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
 prepdir  = '/home/syliaw/shared/bids/fmriprep_output/fmriprep'   #directory where fmriprep was computed
-atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlas from which to extract ROI time-series
-overwrite= False                                                 #should overwrite contents of "denoised/sub-????" directories?
-
+#atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlas from which to extract ROI time-series
+atlas    = './atlases/Ray2013-ICA70.nii'           
+overwrite= True                                                 #should overwrite contents of "denoised/sub-????" directories?
 
 cachedir = prepdir+'/denoised'
-funcdat  = glob.glob(prepdir + '*/*/*/*/*bold_space-MNI152NLin2009cAsym_preproc.nii.gz')
+funcdat  = glob.glob(prepdir + '/*/*/*/*space-MNI152NLin2009cAsym*preproc*.nii*')
+
 if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
    atlasis4d = True
 else:
@@ -38,7 +39,7 @@ class MyStruct(NamedTuple):
     dvrthr:    float
 
 #for temporal filtering cosine functions, consider: https://nipype.readthedocs.io/en/latest/interfaces/generated/nipype.algorithms.confounds.html
-baseregressors = ["Cosine*","NonSteadyStateOutlier*"]
+baseregressors = ["Cosine*","NonSteadyStateOutlier*","cosine*","non_steady_state_outlier*"]
 pipelines = (
 MyStruct(outid='00P',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=[],expansion=0,
@@ -103,9 +104,15 @@ MyStruct(outid='00P',usearoma=False,n_init2drop=0,nonaggr=False,
 #MyStruct(outid='09P+SpkReg80thPctileDVARS',usearoma=False,n_init2drop=0,nonaggr=False,
 #         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
 #         spkreg=1,fdthr=999999,dvrthr=1.4295,addnoise=baseregressors),
+#
+#MyStruct(outid='36P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
+#         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors),
+#
 MyStruct(outid='36P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors),
+         noise=['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z','global_signal', 'white_matter', 'csf'],expansion=2,
+         spkreg=1,fdthr=0.3307,dvrthr=999999,addnoise=baseregressors) ) 
+#
 #MyStruct(outid='36P+SpkReg80thPctileDVARS',usearoma=False,n_init2drop=0,nonaggr=False,
 #         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
 #         spkreg=1,fdthr=999999,dvrthr=1.4295,addnoise=baseregressors))
@@ -115,36 +122,62 @@ MyStruct(outid='36P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=Fal
 #MyStruct(outid='24P+aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,
 #         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=2,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
-MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+#
+#MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal'],expansion=2,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+#
+##MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
+##         noise=['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z', 'global_signal'],expansion=2,
+##         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['a_comp_cor*']),
+#
 #MyStruct(outid='00P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
 #         noise=[],expansion=0,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
 #MyStruct(outid='01P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
 #         noise=['GlobalSignal'],expansion=0,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='02P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='03P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#
+#MyStruct(outid='02P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=['WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='03P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#
+##MyStruct(outid='02P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+##         noise=['white_matter', 'csf'],expansion=0,
+##         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+##MyStruct(outid='03P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+##         noise=['global_signal', 'white_matter', 'csf'],expansion=0,
+##         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#
 #MyStruct(outid='00P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
 #         noise=[],expansion=0,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']),
 #MyStruct(outid='01P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
 #         noise=['GlobalSignal'],expansion=0,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']),
-MyStruct(outid='02P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']),
-MyStruct(outid='03P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']) )
+#
+#MyStruct(outid='02P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']),
+#MyStruct(outid='03P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']) )
+#
+##MyStruct(outid='02P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
+##         noise=['white_matter', 'csf'],expansion=0,
+##         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']),
+##MyStruct(outid='03P+AROMAAgg',usearoma=False,n_init2drop=0,nonaggr=False,
+##         noise=['global_signal', 'white_matter', 'csf'],expansion=0,
+##         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['AROMAAggrComp*','aroma_motion*']) )
 
 idlist      = np.chararray((len(funcdat),len(pipelines)),itemsize=len(os.path.basename(funcdat[0]).split('_')[0]),unicode=True)
 atlaslist   = np.chararray((len(funcdat),len(pipelines)),itemsize=len(atlas),unicode=True)
+ses         = np.chararray((len(funcdat),len(pipelines)),itemsize=2,unicode=True)
+task        = np.chararray((len(funcdat),len(pipelines)),itemsize=5,unicode=True)
+run         = np.chararray((len(funcdat),len(pipelines)),itemsize=5,unicode=True)
 fdthr       = np.zeros((len(funcdat),len(pipelines)))
 dvthr       = np.zeros((len(funcdat),len(pipelines)))
 ntr         = np.zeros((len(funcdat),len(pipelines)))
@@ -163,9 +196,16 @@ for ii in range(0,len(funcdat)):
    #get stuff for current case
    curfunc = funcdat[ii]
    curdir  = os.path.dirname(curfunc)
-   curmask = glob.glob(curdir + '/*bold_space-MNI152NLin2009cAsym_brainmask.nii.gz')[0]
-   curconf = glob.glob(curdir + '/*bold_confounds.tsv')[0]
-   cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym_dtissue.nii.gz')[0]
+   curmask = glob.glob(curdir + '/*' +
+                       curfunc.split('task-')[1].split('_')[0] + '*' +
+                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*space-MNI152NLin2009cAsym*brain*mask.nii*')[0]
+   curconf = glob.glob(curdir + '/' + os.path.basename(curfunc)[0:11]+ '*' + 
+                       curfunc.split('task-')[1].split('_')[0] + '*' + 
+                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*confounds*.tsv')[0]
+   if not glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dtissue*.nii*'):
+      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dseg*.nii*')[0]
+   else:
+      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dtissue*.nii*')[0]
    curcache= cachedir + '/' + os.path.basename(curfunc)[0:11]
    dim1,dim2,dim3,timepoints = load(curfunc, mmap=NUMPY_MMAP).shape
    t = time.time()
@@ -201,28 +241,49 @@ for ii in range(0,len(funcdat)):
      # also, the functional file-derived signals should come from the existing AROMA.nii.gz, this section of code will
      # replace the contents of existing 'WhiteMatter', 'CSF', 'GlobalSignal' with new contents from the AROMA cleaned file
      nAROMAComps = 0
+     tmpAROMA    = (curdir + '/tmpAROMA_' +
+                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '.nii.gz')
+     tmpAROMAconf= (curdir + '/tmpAROMA_' +
+                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_confounds.tsv')
+     tmpAROMAwm  = (curcache + '/tmpAROMA_' +
+                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_wm.nii.gz')
+     tmpAROMAcsf = (curcache + '/tmpAROMA_' +
+                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_csf.nii.gz')
      if usearoma:
         from nipype.interfaces.fsl.utils import FilterRegressor
-        nAROMAComps = nAROMAComps + len(np.loadtxt(glob.glob(curdir + '/*bold_AROMAnoiseICs.csv')[0],delimiter=',').astype('int'))
-        if (not os.path.isfile(outfile) or overwrite) or (not os.path.isfile(curcache + '/tmpAROMA.nii.gz') and overwrite):
-           FilterRegressor(design_file=glob.glob(curdir + '/*bold_MELODICmix.tsv')[0],
-                           filter_columns=list(np.loadtxt(glob.glob(curdir + '/*bold_AROMAnoiseICs.csv')[0],delimiter=',').astype('int')),
+        nAROMAComps = nAROMAComps + len(np.loadtxt(glob.glob(curdir + '/*'+
+                            curfunc.split('task-')[1].split('_')[0] + '*' +
+                            curfunc.split('run-')[1].split('_')[0]  + '*' + '*AROMAnoiseICs.csv')[0],delimiter=',').astype('int'))
+        if (not os.path.isfile(outfile) or overwrite) or (not os.path.isfile(tmpAROMA) and overwrite):
+           FilterRegressor(design_file=                   glob.glob(curdir + '/*'+
+                                   curfunc.split('task-')[1].split('_')[0] + '*' +
+                                   curfunc.split('run-')[1].split('_')[0]  + '*' + '*MELODIC*.tsv')[0],
+                           filter_columns=list(np.loadtxt(glob.glob(curdir + '/*'+
+                                   curfunc.split('task-')[1].split('_')[0] + '*' +
+                                   curfunc.split('run-')[1].split('_')[0]  + '*' + '*AROMAnoiseICs.csv')[0],delimiter=',').astype('int')),
                            in_file=curfunc,
                            mask=curmask,
-                           out_file=curcache + '/tmpAROMA.nii.gz').run()
-        if not os.path.isfile(curcache + '/AROMA_confounds.tsv'):
-           if not os.path.isfile(curcache + '/aroma-wmmask.nii.gz') or not os.path.isfile(curcache + '/aroma-csfmask.nii.gz'):
+                           out_file=tmpAROMA).run()
+        if not os.path.isfile(tmpAROMAconf):
+           if not os.path.isfile(tmpAROMAwm) or not os.path.isfile(tmpAROMAcsf):
               from nipype.interfaces.fsl.maths import Threshold
               from nipype.interfaces.fsl.utils import ImageMeants
-              Threshold(in_file=cursegm, thresh=2.5, out_file=curcache + '/aroma-wmmask.nii.gz',  args=' -uthr 3.5 -kernel sphere 4 -ero -bin').run()
-              Threshold(in_file=cursegm, thresh=0.5, out_file=curcache + '/aroma-csfmask.nii.gz', args=' -uthr 1.5 -kernel sphere 2 -ero -bin').run() 
-           wmts = NiftiLabelsMasker(labels_img=curcache + '/aroma-wmmask.nii.gz', detrend=False, standardize=False).fit_transform(curcache + '/tmpAROMA.nii.gz')
-           csfts= NiftiLabelsMasker(labels_img=curcache + '/aroma-csfmask.nii.gz',detrend=False, standardize=False).fit_transform(curcache + '/tmpAROMA.nii.gz') 
-           gsts = NiftiLabelsMasker(labels_img=curmask                           ,detrend=False, standardize=False).fit_transform(curcache + '/tmpAROMA.nii.gz')
+              Threshold(in_file=cursegm, thresh=2.5, out_file=tmpAROMAwm,  args=' -uthr 3.5 -kernel sphere 4 -ero -bin').run()
+              Threshold(in_file=cursegm, thresh=0.5, out_file=tmpAROMAcsf, args=' -uthr 1.5 -kernel sphere 2 -ero -bin').run() 
+           wmts = NiftiLabelsMasker(labels_img=tmpAROMAwm , detrend=False, standardize=False).fit_transform(tmpAROMA)
+           csfts= NiftiLabelsMasker(labels_img=tmpAROMAcsf, detrend=False, standardize=False).fit_transform(tmpAROMA) 
+           gsts = NiftiLabelsMasker(labels_img=curmask    , detrend=False, standardize=False).fit_transform(tmpAROMA)
            AROMAconfounds = np.concatenate( (csfts, wmts, gsts), axis=1)
-           np.savetxt(curcache + '/AROMA_confounds.tsv', AROMAconfounds, header='CSF\tWhiteMatter\tGlobalSignal',comments='',delimiter='\t')
-        AROMAconfounds = pd.read_csv(curcache + '/AROMA_confounds.tsv',sep='\t')
-        confounds[['CSF','WhiteMatter','GlobalSignal']] = AROMAconfounds[['CSF','WhiteMatter','GlobalSignal']]
+           np.savetxt(tmpAROMAconf, AROMAconfounds, header='CSF\tWhiteMatter\tGlobalSignal',comments='',delimiter='\t')
+        AROMAconfounds = pd.read_csv(tmpAROMAconf,sep='\t')
+        if 'GlobalSignal' in list(confounds):
+           confounds[['CSF','WhiteMatter','GlobalSignal']]   = AROMAconfounds[['CSF','WhiteMatter','GlobalSignal']]
+        else:
+           confounds[['csf','white_matter','global_signal']] = AROMAconfounds[['CSF','WhiteMatter','GlobalSignal']]
 
      # "noise" and "addnoise" are both regressed from the data, however, (optional) derivative and expansion terms are applied
      # to the "noise" columns, whereas no derivatives/expansions are applied to "addnoise" (i.e., which will be 0-lag/non-expanded)
@@ -246,7 +307,9 @@ for ii in range(0,len(funcdat)):
      #spike columns - taken from another script, a bit kloogey
      SpikeReg = np.ones([timepoints,1])
      if do_spikereg is 1:
-        SpikeReg = (((confounds.stdDVARS > dvar_thresh) | (confounds.FramewiseDisplacement > fd_thresh))==False)*1
+        DVARS = confounds.filter(['stdDVARS','std_dvars']) 
+        FD    = confounds.filter(['FramewiseDisplacement','framewise_displacement'])        
+        SpikeReg = (np.sum(np.concatenate((DVARS>dvar_thresh,FD>fd_thresh),axis=1),axis=1)==1)*1 
      if n_init2drop>0:
         SpikeReg[0:(n_init2drop)] = 0 
      censorcols   = np.where(SpikeReg==0)[0]
@@ -262,8 +325,8 @@ for ii in range(0,len(funcdat)):
 
      if not os.path.isfile(outfile) or overwrite:
         print ('Regressing ' + str(NoiseReg.shape[1]+nAROMAComps) + ' parameters from ROI time-series...')
-        if usearoma: roits = masker.fit_transform(curcache + '/tmpAROMA.nii.gz',confounds=NoiseReg)
-        else:        roits = masker.fit_transform(curfunc,                      confounds=NoiseReg) 
+        if usearoma: roits = masker.fit_transform(tmpAROMA,confounds=NoiseReg)
+        else:        roits = masker.fit_transform(curfunc, confounds=NoiseReg) 
         np.savetxt(outfile, roits, delimiter='\t') 
         elapsed = time.time() - t
         print ('Elapsed time (s) for ' + pipelines[jj].outid + ': ' + str(np.round(elapsed,1)))
@@ -271,25 +334,31 @@ for ii in range(0,len(funcdat)):
      #store info into dataframe w/ 
      idlist[ii,jj]      = os.path.basename(curfunc).split('_')[0]
      atlaslist[ii,jj]   = atlas
+     ses[ii,jj]         = curfunc.split('ses-')[1].split('/')[0]  
+     task[ii,jj]        = curfunc.split('task-')[1].split('_')[0]    
+     run[ii,jj]         = curfunc.split('run-')[1].split('_')[0]     
      ntr[ii,jj]         = float(timepoints)
      fdthr[ii,jj]       = float(pipelines[jj].fdthr)
      dvthr[ii,jj]       = float(pipelines[jj].dvrthr)
      ntrabovethr[ii,jj] = float(np.sum(SpikeReg==0)) - n_init2drop
      pctdflost[ii,jj]   = float(NoiseReg.shape[1]+nAROMAComps)/float(NoiseReg.shape[0])
      #pctdflost[ii,jj]   = float(NoiseReg.shape[1])/float(NoiseReg.shape[0])
-     mfd[ii,jj]         = float(np.mean(confounds['FramewiseDisplacement'][1:-1])) 
-     medfd[ii,jj]       = float(np.median(confounds['FramewiseDisplacement'][1:-1]))
-     maxfd[ii,jj]       = float(np.max( confounds['FramewiseDisplacement'][1:-1]))
-     mdv[ii,jj]         = float(np.mean(confounds['stdDVARS'][1:-1]))
-     meddv[ii,jj]       = float(np.median(confounds['stdDVARS'][1:-1]))
-     maxdv[ii,jj]       = float(np.max( confounds['stdDVARS'][1:-1]))
+     mfd[ii,jj]         = float(np.mean(confounds.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1])) 
+     medfd[ii,jj]       = float(np.median(confounds.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1]))
+     maxfd[ii,jj]       = float(np.max( confounds.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1]))
+     mdv[ii,jj]         = float(np.mean(confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
+     meddv[ii,jj]       = float(np.median(confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
+     maxdv[ii,jj]       = float(np.max( confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
 
-   if os.path.isfile(curcache + '/tmpAROMA.nii.gz'):      os.remove(curcache + '/tmpAROMA.nii.gz')
-   if os.path.isfile(curcache + '/aroma-wmmask.nii.gz'):  os.remove(curcache + '/aroma-wmmask.nii.gz')
-   if os.path.isfile(curcache + '/aroma-csfmask.nii.gz'): os.remove(curcache + '/aroma-csfmask.nii.gz')
+   if os.path.isfile(tmpAROMA   ):  os.remove(tmpAROMA)
+   if os.path.isfile(tmpAROMAwm ):  os.remove(tmpAROMAwm)
+   if os.path.isfile(tmpAROMAcsf):  os.remove(tmpAROMAcsf)
 
 for jj in range(0,len(pipelines)):
    df = pd.DataFrame({'participant_id':idlist[:,jj], 
+                      'ses_id':ses[:,jj],
+                      'task_id':task[:,jj],
+                      'run_id':run[:,jj],
                       'atlas':atlaslist[:,jj],
                       'TR':ntr[:,jj], 
                       'FDthr':fdthr[:,jj], 

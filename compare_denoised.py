@@ -8,35 +8,35 @@ from nipype.utils import NUMPY_MMAP                 #may only work on certain sy
 from nilearn import plotting #Needs at least this version: pip install nilearn==0.5.0a0 (cf. https://nilearn.github.io/whats_new.html)
 
 #these will be required inputs
-bidsdir   = '/labs/mctfr-fmri/bids/es'
-denoisedir= '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/denoised'
+bidsdir   = '/home/syliaw/shared/bids/cot'
+denoisedir= '/home/syliaw/shared/bids/fmriprep_output/fmriprep/denoised'
 pipelines = [
 '00P',
-'01P',
-'02P',
-'03P',
-'06P',
-'09P',
-'24P',
-'36P',
-'03P+SpkReg80thPctileFD',
-'09P+SpkReg80thPctileFD',
+#'01P',
+#'02P',
+#'03P',
+#'06P',
+#'09P',
+#'24P',
+#'36P',
+#'03P+SpkReg80thPctileFD',
+#'09P+SpkReg80thPctileFD',
 '36P+SpkReg80thPctileFD',
-'03P+SpkReg80thPctileDVARS',
-'09P+SpkReg80thPctileDVARS',
-'36P+SpkReg80thPctileDVARS',
-'03P+SpkReg80thPctile',
-'09P+SpkReg80thPctile',
-'36P+SpkReg80thPctile',
-'00P+aCompCor',
-'24P+aCompCor',
+#'03P+SpkReg80thPctileDVARS',
+#'09P+SpkReg80thPctileDVARS',
+#'36P+SpkReg80thPctileDVARS',
+#'03P+SpkReg80thPctile',
+#'09P+SpkReg80thPctile',
+#'36P+SpkReg80thPctile',
+#'00P+aCompCor',
+#'24P+aCompCor',
 '24P+aCompCor+4GSR',
-'00P+AROMANonAgg',
-'01P+AROMANonAgg',
+#'00P+AROMANonAgg',
+#'01P+AROMANonAgg',
 '02P+AROMANonAgg',
 '03P+AROMANonAgg',
-'00P+AROMAAgg',
-'01P+AROMAAgg',
+#'00P+AROMAAgg',
+#'01P+AROMAAgg',
 '02P+AROMAAgg',
 '03P+AROMAAgg']
 
@@ -45,10 +45,10 @@ pipelines = [
 atlas     = './atlases/Gordon2016+HarvOxSubCort.nii' #should save this to "allsubjdenoised" from fmriprep2denoised_atlas.py 349 nodes
 pthr      = .001                                     #p-criterion for quantifying edges (uncorrected)
 
-reconvers =['syngo_MR_E11'] #['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
+#reconvers =['syngo_MR_E11'] #['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
 centsv    = '00P' #or, pipelines[0]
-trpctbad  =   60
-badidlist = '/labs/burwellstudy/projects/twinness/scripts/esmf_poorquality.txt'
+trpctbad  =   20
+badidlist = '/home/syliaw/burwell/python3/fmriprep_denoising/cot_poorquality.txt'
 
 if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
    atlasis4d = True
@@ -65,8 +65,8 @@ for ii in range(0, len(allsubjdenoised.participant_id)):
 allsubjbids     = allsubjbids.reindex(np.array(mapidx))
 allsubjdenoised = allsubjdenoised.join( allsubjbids.iloc[:,1:].reset_index(drop=True) )
 subj2drop       = (allsubjdenoised.participant_id[ ((allsubjdenoised.TRabovethr / allsubjdenoised.TR) * 100)>trpctbad ].tolist() + 
-                   open(badidlist).read().split() + 
-                   allsubjdenoised.participant_id[ np.in1d(allsubjdenoised.SoftwareVersions,reconvers)==False ].tolist())
+                   open(badidlist).read().split() ) # + 
+                   #allsubjdenoised.participant_id[ np.in1d(allsubjdenoised.SoftwareVersions,reconvers)==False ].tolist())
 
 #resume...
 subjects   = [i for i in os.listdir(denoisedir) if 'sub-' in i and i not in subj2drop]
