@@ -255,7 +255,7 @@ for ii in range(0,len(funcdat)):
      ntr[ii,jj]         = float(timepoints)
      fdthr[ii,jj]       = float(pipelines[jj].fdthr)
      dvthr[ii,jj]       = float(pipelines[jj].dvrthr)
-     ntrabovethr[ii,jj] = float(np.sum(SpikeReg==0)) - n_init2drop
+     ntrabovethr[ii,jj] = float(np.sum(SpikeReg==1)) - n_init2drop
      pctdflost[ii,jj]   = float(NoiseReg.shape[1]+nAROMAComps)/float(NoiseReg.shape[0])
      mfd[ii,jj]         = float(np.mean(confounds.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1])) 
      medfd[ii,jj]       = float(np.median(confounds.filter(['FramewiseDisplacement','framewise_displacement'])[1:-1]))
