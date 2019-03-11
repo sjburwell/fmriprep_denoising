@@ -273,7 +273,8 @@ for ii in range(0,len(funcdat)):
            tproject.inputs.automask = False
            tproject.inputs.mask = curmask
         tproject.inputs.bandpass= tuple(bandpass)
-        tproject.inputs.ort     = curcache + '/NoiseReg.txt'
+        if NoiseReg.shape[1]>0:
+           tproject.inputs.ort     = curcache + '/NoiseReg.txt'
         #tproject.inputs.censor  = curcache + "/SpikeReg.txt"
         #tproject.inputs.cenmode = 'NTRP'
         tproject.inputs.out_file= curcache + "/errts_3dtproject.nii"  
