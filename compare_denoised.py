@@ -3,52 +3,42 @@ import glob
 import numpy as np
 import pandas as pd
 import scipy as sp
+import matplotlib.pyplot as plt
 from nibabel import load
-from nipype.utils import NUMPY_MMAP                 #may only work on certain systems??
-from nilearn import plotting #Needs at least this version: pip install nilearn==0.5.0a0 (cf. https://nilearn.github.io/whats_new.html)
+from nipype.utils import NUMPY_MMAP    
+from nilearn import plotting           #Needs at least this version: pip install nilearn==0.5.0a0 (cf. https://nilearn.github.io/whats_new.html)
 
 #these will be required inputs
-bidsdir   = '/home/syliaw/shared/bids/cot'
-denoisedir= '/home/syliaw/shared/bids/fmriprep_output/fmriprep/denoised'
+bidsdir   = '/labs/mctfr-fmri/bids/es'
+denoisedir= '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep/denoised'
 pipelines = [
 '00P',
-#'01P',
-#'02P',
-#'03P',
-#'06P',
-#'09P',
-#'24P',
-#'36P',
-#'03P+SpkReg80thPctileFD',
-#'09P+SpkReg80thPctileFD',
+'01P',
+'02P',
+'03P',
+'06P',
+'09P',
+'24P',
+'36P',
+'03P+SpkReg80thPctileFD',
+'09P+SpkReg80thPctileFD',
 '36P+SpkReg80thPctileFD',
-#'03P+SpkReg80thPctileDVARS',
-#'09P+SpkReg80thPctileDVARS',
-#'36P+SpkReg80thPctileDVARS',
-#'03P+SpkReg80thPctile',
-#'09P+SpkReg80thPctile',
-#'36P+SpkReg80thPctile',
-#'00P+aCompCor',
-#'24P+aCompCor',
+'00P+aCompCor',
+'24P+aCompCor',
 '24P+aCompCor+4GSR',
-#'00P+AROMANonAgg',
-#'01P+AROMANonAgg',
+'00P+AROMANonAgg',
+'01P+AROMANonAgg',
 '02P+AROMANonAgg',
-'03P+AROMANonAgg',
-#'00P+AROMAAgg',
-#'01P+AROMAAgg',
-'02P+AROMAAgg',
-'03P+AROMAAgg']
-
+'03P+AROMANonAgg']
 
 #these will be optional inputs
 atlas     = './atlases/Gordon2016+HarvOxSubCort.nii' #should save this to "allsubjdenoised" from fmriprep2denoised_atlas.py 349 nodes
 pthr      = .001                                     #p-criterion for quantifying edges (uncorrected)
 
-#reconvers =['syngo_MR_E11'] #['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
-centsv    = '00P' #or, pipelines[0]
-trpctbad  =   20
-badidlist = '/home/syliaw/burwell/python3/fmriprep_denoising/cot_poorquality.txt'
+reconvers =['syngo_MR_E11'] #['syngo_MR_B17','syngo_MR_D13D','syngo_MR_E11'] #Trio, ESP, ESQ (respectively)
+centsv    = '00P'           #or, pipelines[0]
+trpctbad  =   60
+badidlist = '/labs/burwellstudy/projects/twinness/scripts/esmf_poorquality.txt'
 
 if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
    atlasis4d = True
@@ -64,9 +54,9 @@ for ii in range(0, len(allsubjdenoised.participant_id)):
        mapidx.append(np.ravel(np.where(allsubjdenoised.participant_id[ii]==allsubjbids.participant_id))[0])
 allsubjbids     = allsubjbids.reindex(np.array(mapidx))
 allsubjdenoised = allsubjdenoised.join( allsubjbids.iloc[:,1:].reset_index(drop=True) )
-subj2drop       = (allsubjdenoised.participant_id[ ((allsubjdenoised.TRabovethr / allsubjdenoised.TR) * 100)>trpctbad ].tolist() + 
-                   open(badidlist).read().split() ) # + 
-                   #allsubjdenoised.participant_id[ np.in1d(allsubjdenoised.SoftwareVersions,reconvers)==False ].tolist())
+subj2drop       = (allsubjdenoised.participant_id[ ((allsubjdenoised.TRabovethr / allsubjdenoised.TR) * 100)>trpctbad ].tolist() +
+                   open(badidlist).read().split() +
+                   allsubjdenoised.participant_id[ np.in1d(allsubjdenoised.SoftwareVersions,reconvers)==False ].tolist())
 
 #resume...
 subjects   = [i for i in os.listdir(denoisedir) if 'sub-' in i and i not in subj2drop]
@@ -92,7 +82,7 @@ for ii in range(0,len(pipelines)):
         roicm = np.corrcoef(roits.transpose())              #Correlation coeff among ROI time-series
         roicm[roicm==1] = .999                              #The next step can't handle ones, so kloodge
         roicm = np.arctanh(roicm)                           #Fischer z-transformed correlation coeff
-        graphs[jj,:,:] = roicm
+        graphs[jj,:,:] = roicm                              #Cache network connectivity to larger graph structure
 
     lowertri = np.where(np.tril(graphs[jj,:,:], -1)!=0)    
 
@@ -131,21 +121,17 @@ for ii in range(0,len(pipelines)):
     tdof_lsv[ii] = np.std(allsubjdenoised.PctDFlost)  * 100 
 
 
-
-
-
-
-import matplotlib.pyplot as plt
+##plotting the results 
  
 # set width of bar
 barWidth = 0.25
  
-# set height of bar
+# specify bars, and bar heights 
 ranks = (-qcfc_fdq).argsort()
 pnames= [pipelines[i] for i in ranks]
-bars1 = qcfc_fdq[ranks]               #[12, 30, 1, 8, 22]
-bars2 = np.abs(qcfc_ddr[ranks]) * 100 #[28, 6, 16, 5, 10]
-bars3 = tdof_lsm[ranks]               #[29, 3, 24, 25, 17]
+bars1 = qcfc_fdq[ranks]               
+bars2 = np.abs(qcfc_ddr[ranks]) * 100 
+bars3 = tdof_lsm[ranks]               
  
 # Set position of bar on X axis
 r1 = np.arange(len(bars1))
@@ -165,10 +151,7 @@ plt.ylim(0,100)
 # Create legend & Show graphic
 plt.legend()
 plt.tight_layout()
+plt.savefig('denoising_output.png')
 plt.show()
-
-
-
-plt.savefig('samplefigure.pdf', bbox_inches='tight')
 
 
