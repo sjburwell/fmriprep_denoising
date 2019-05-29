@@ -15,7 +15,7 @@ from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
 prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'  #directory where fmriprep was computed
-atlas    = './atlases/Schaefer400+Str7Thl7BL.nii'                #atlas from which to extract ROI time-series
+atlas    = './atlases/Schaefer400+HarvOxSubCortRL.nii'           #atlas from which to extract ROI time-series
 overwrite= True #False                                           #should overwrite contents of "denoised/sub-????" directories
 
 cachedir = prepdir+'/denoised-3dtproject_passband-.009to9999'
@@ -261,7 +261,7 @@ for ii in range(0,len(funcdat)):
      NoiseReg = NoiseReg - np.mean(NoiseReg,axis=0)
      if any (np.mean(NoiseReg,axis=0)==0): 
         NoiseReg = np.delete(NoiseReg,np.where(np.mean(NoiseReg,axis=0)==0)[0][0],1)
-     noise_fn = curcache + "/NoiseReg" + "_Proc-" + pipelines[jj].outid + "_ROI-" + os.path.basename(atlas)[0:-4] + ".nii"
+     noise_fn = curcache + "/NoiseReg" + "_Proc-" + pipelines[jj].outid + "_ROI-" + os.path.basename(atlas)[0:-4] + ".txt"
      np.savetxt(noise_fn,NoiseReg)
 
      #do the regression
@@ -311,11 +311,12 @@ for ii in range(0,len(funcdat)):
      meddv[ii,jj]       = float(np.median(confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
      maxdv[ii,jj]       = float(np.max( confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
 
+     if os.path.isfile(errts_fn):   os.remove(errts_fn)
+     if os.path.isfile(noise_fn):   os.remove(noise_fn)
+
    if os.path.isfile(tmpAROMA   ):  os.remove(tmpAROMA)
    if os.path.isfile(tmpAROMAwm ):  os.remove(tmpAROMAwm)
    if os.path.isfile(tmpAROMAcsf):  os.remove(tmpAROMAcsf)
-   if os.path.isfile(errts_fn):     os.remove(errts_fn) 
-   if os.path.isfile(noise_fn):     os.remove(noise_fn)
 
 for jj in range(0,len(pipelines)):
    df = pd.DataFrame({'participant_id':idlist[:,jj], 
