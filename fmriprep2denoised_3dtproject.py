@@ -14,9 +14,9 @@ from nilearn.input_data import NiftiMapsMasker
 from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
-prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'  #directory where fmriprep was computed
+prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-mf2/fmriprep'  #directory where fmriprep was computed
 atlas    = './atlases/Schaefer400+HarvOxSubCortRL.nii'           #atlas from which to extract ROI time-series
-overwrite= True #False                                           #should overwrite contents of "denoised/sub-????" directories
+overwrite= False                                                 #should overwrite contents of "denoised/sub-????" directories
 
 cachedir = prepdir+'/denoised-3dtproject_passband-.009to9999'
 funcdat  = glob.glob(prepdir + '/*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*') #fmriprep version inconsistency
@@ -72,11 +72,11 @@ pipelines = (
 MyStruct(outid='09P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X','Y','Z','RotX','RotY','RotZ','GlobalSignal','WhiteMatter','CSF',
                 'trans_x','trans_y','trans_z','rot_x','rot_y','rot_z','global_signal','white_matter','csf'],expansion=0,
-         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors,passband=[.009,9999]),
+         spkreg=1,fdthr=0.3135,dvrthr=999999,addnoise=baseregressors,passband=[.009,9999]),
 MyStruct(outid='36P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X','Y','Z','RotX','RotY','RotZ','GlobalSignal','WhiteMatter','CSF',
                 'trans_x','trans_y','trans_z','rot_x','rot_y','rot_z','global_signal','white_matter','csf'],expansion=2,
-         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors,passband=[.009,9999]),
+         spkreg=1,fdthr=0.3135,dvrthr=999999,addnoise=baseregressors,passband=[.009,9999]),
 #MyStruct(outid='00P+aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,                                      #<- a_comp_cor??? instead?
 #         noise=[],expansion=0,
 #         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*','a_comp_cor*',"Cosine*","cosine*"],passband=[.009,9999]),
@@ -129,7 +129,7 @@ meddv       = np.zeros((len(funcdat),len(pipelines)))
 maxdv       = np.zeros((len(funcdat),len(pipelines)))
 if not os.path.isdir(cachedir):
     os.mkdir(cachedir)
-for ii in range(0,len(funcdat)): 
+for ii in range(0,len(funcdat)): #range(0,len(funcdat)): 
 
    #get stuff for current case
    curfunc = funcdat[ii]
@@ -266,7 +266,7 @@ for ii in range(0,len(funcdat)):
 
      #do the regression
      errts_fn = curcache + "/errts_3dtproject" + "_Proc-" + pipelines[jj].outid + "_ROI-" + os.path.basename(atlas)[0:-4] + ".nii"
-     if not os.path.isfile(outfile) or overwrite:
+     if (not os.path.isfile(outfile) or overwrite) and (NoiseReg.shape[1]/NoiseReg.shape[0] < .90):
         if os.path.isfile(errts_fn):
            os.remove(errts_fn)
         tproject = TProject()

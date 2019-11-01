@@ -14,8 +14,8 @@ from nilearn.connectome import ConnectivityMeasure
 
 #Data source, filenames, output directories
 prepdir  = '/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep'  #directory where fmriprep was computed
-atlas    = './atlases/Gordon2016+HarvOxSubCort.nii'              #atlas from which to extract ROI time-series
-overwrite= False                                                 #should overwrite contents of "denoised/sub-????" directories
+atlas    = './atlases/Ray2013-ICA70.nii'                         #atlas from which to extract ROI time-series
+overwrite= True                                                  #should overwrite contents of "denoised/sub-????" directories
 
 cachedir = prepdir+'/denoised'
 funcdat  = glob.glob(prepdir + '/*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*') #fmriprep version inconsistency
@@ -41,51 +41,57 @@ class MyStruct(NamedTuple):
 #for temporal filtering cosine functions, consider: https://nipype.readthedocs.io/en/latest/interfaces/generated/nipype.algorithms.confounds.html
 baseregressors = ["Cosine*","NonSteadyStateOutlier*","cosine*","non_steady_state_outlier*"]
 pipelines = (
-MyStruct(outid='00P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=[],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='01P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['GlobalSignal'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='02P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='03P',usearoma=False,n_init2drop=0,nonaggr=False,
+#MyStruct(outid='00P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=[],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='01P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='02P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='03P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='06P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='24P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=2,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='09P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='36P',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+MyStruct(outid='03P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='06P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='24P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='09P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='36P',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors),
+MyStruct(outid='09P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
+         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors),
 MyStruct(outid='36P+SpkReg80thPctileFD',usearoma=False,n_init2drop=0,nonaggr=False,
          noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ','GlobalSignal', 'WhiteMatter', 'CSF'],expansion=2,
-         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors),
-MyStruct(outid='00P+aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,                                           #<- a_comp_cor??? also/instead?
-         noise=[],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
-MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
-         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal'],expansion=2,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
-MyStruct(outid='00P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=[],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='01P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=['GlobalSignal'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='02P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=['WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
-MyStruct(outid='03P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
-         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
-         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors))
+         spkreg=1,fdthr=0.2501,dvrthr=999999,addnoise=baseregressors) )
+#MyStruct(outid='00P+aCompCor',usearoma=False,n_init2drop=0,nonaggr=False,                                           #<- a_comp_cor??? also/instead?
+#         noise=[],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+#MyStruct(outid='24P+aCompCor+4GSR',usearoma=False,n_init2drop=0,nonaggr=False,
+#         noise=['X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ', 'GlobalSignal'],expansion=2,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors+['aCompCor*']),
+#MyStruct(outid='00P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=[],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='01P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='02P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=['WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors),
+#MyStruct(outid='03P+AROMANonAgg',usearoma=True,n_init2drop=0,nonaggr=False,
+#         noise=['GlobalSignal', 'WhiteMatter', 'CSF'],expansion=0,
+#         spkreg=0,fdthr=99,dvrthr=99,addnoise=baseregressors))
 
 idlist      = np.chararray((len(funcdat),len(pipelines)),itemsize=len(os.path.basename(funcdat[0]).split('_')[0]),unicode=True)
 atlaslist   = np.chararray((len(funcdat),len(pipelines)),itemsize=len(atlas),unicode=True)
@@ -124,6 +130,8 @@ for ii in range(0,len(funcdat)):
    dim1,dim2,dim3,timepoints = load(curfunc, mmap=NUMPY_MMAP).shape
    t = time.time()
    print ('Current subject (' + str(ii) + '): ' + curfunc)
+
+   #drop detrending from below??? the nuiscance regressors are not detrended...
 
    # if the "atlas" is a set of weighted maps (e.g., ICA spatial maps), use the mapsMasker (with smoothing)
    if atlasis4d:
@@ -238,7 +246,7 @@ for ii in range(0,len(funcdat)):
         NoiseReg = np.delete(NoiseReg,np.where(np.mean(NoiseReg,axis=0)==0)[0][0],1)
 
      #do the regression, get the residuals
-     if not os.path.isfile(outfile) or overwrite:
+     if (not os.path.isfile(outfile) or overwrite) and (NoiseReg.shape[1]/NoiseReg.shape[0] < .90):
         print ('Regressing ' + str(NoiseReg.shape[1]+nAROMAComps) + ' parameters from ROI time-series...')
         if usearoma: roits = masker.fit_transform(tmpAROMA,confounds=NoiseReg)
         else:        roits = masker.fit_transform(curfunc, confounds=NoiseReg) 
