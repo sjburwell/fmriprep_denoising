@@ -75,3 +75,8 @@ For deeper explanation of _AROMANonAgg_ vs _AROMAAgg_ denoising, please see [dis
 # Output:
 In the cache directory, the program denoise_fmriprep_output.py generates subject directories containing tab-separated variable (TSV) files where each column reflects a single time-series for a requested region of interest (ROIs), and each row reflects the time-points of the scanning session (i.e., TRs). For each subject and each denoising approach, there should be one TSV file. Additionally, at the root of the cache directory, there are two TSV files containing meta-data from preprocessing. 
 ![alt text](https://github.com/sjburwell/fmriprep_denoising/blob/master/fmriprep_denoising_directory_output.JPG)
+
+# References
+* [Ciric, R., ... Satterthwaite, T.D. (2017). Benchmarking of participant-level confound regression strategies for the control of motion artifact in studies of functional connectivity. *NeuroImage, 154*, 174-187.](https://doi.org/10.1016/j.neuroimage.2017.03.020)
+* [Parkes, L., Fulcher, B., Yucel, M., & Fornito, A. (2018). An evaluation of the efficacy, reliability, and sensitivity of motion correction strategies for resting-state functional MRI. *NeuroImage, 171*, 415-436.](https://doi.org/10.1016/j.neuroimage.2017.12.073)
+
