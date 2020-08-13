@@ -18,9 +18,13 @@ conda env create -f environment.yml
 conda activate python363
 ```
 
-Next, run the denoising program. If you don't have AFNI and FSL neuroimaging toolboxes in your system path already, now is the time to load them. Below, they are added by the "load module" command, but things may be different on different machines. 
+Next, run the denoising program. If you don't have AFNI and FSL neuroimaging toolboxes in your system path already, now is the time to load them. Below, they are added by the "load module" command, but things may be different on different machines. You can check whether these programs already exist in your path by using the "which fsl" or "which afni" command. 
 ```linux
 module load afni fsl
+```
+
+Finally, once AFNI and FSL are loaded, run the program...
+```linux
 python denoise_fmriprep_output.py \
   --prepdir=/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep \
   --atlas=./atlases/Conn17f_atlas.nii \
