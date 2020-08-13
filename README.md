@@ -2,8 +2,6 @@
 Scripts for comparing different fmriprep denoising approaches on quality control functional connectivity (QC-FC) motion, QC-FC distance-dependence, and temporal degree of freedom loss.
 
 The Python program denoise_fmriprep_output.py will execute any of several pre-set denoising pipelines (_description forthcoming_) which are mostly based on published, validated methods. For each functional file identified in its path, denoise_fmriprep_output.py will generate an RxT *tsv file containing the denoised time-series, where R is the number of "ROIs" (Regions Of Interest) in the atlas file and T is the number of TRs in the data. The atlas can be either a 3D *nii of discrete integers corresponding to ROIs, or a 4D *nii of probabalistic ROIs (e.g., ICA output).
- 
-The script compare_denoised.py will generate QCFC motion, distance dependence, and tDOF loss metrics.
 
 # Example usage:
 In Linux, first clone the GitHub repository into your local directory. Alternatively, you can use the GitHub GUI to download and unzip the code. 
