@@ -26,16 +26,17 @@ python denoise_fmriprep_output.py \
   --atlas=./atlases/Conn17f_atlas.nii \
   --pipes=['24P+aCompCor+4GSR','03P+AROMANonAgg'] \
   --overwrite=True \
-  --cachedir=./tmp \
+  --cachedir=./tmpdir \
   --funcpointer=/sub-88302*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*
 ```
 In the above code, the arguements explained below:
 * 'prepdir' refers to the directory in which fmriprep output is saved
-* 'atlas' points to a Nifti file containing either a 3-dimensional "atlas" where voxels' values pertain to different regions of interest (e.g., 0=nonbrain, 1=hippocampus, 2=amygdala, etc.) or 4-dimensional series of "maps" where the 4th dimension contains statistical maps of activations (e.g., ICA weights)
+* 'atlas' points to a Nifti file containing either a 3-dimensional "atlas" where voxels' integer values pertain to different regions of interest (e.g., 0=nonbrain, 1=hippocampus, 2=amygdala, etc.) or 4-dimensional series of "maps" where the 4th dimension contains statistical maps of activations (e.g., ICA weights)
 * 'pipes' refers to the denoising pipelines to be requested (see below for more info)
 * 'overwrite' is a booean which determines whether previous output(s) will be overwritten (default: False)
 * 'cachedir' is the directory in which output files will be written (default: './tmpdir')
-* 'funcpointer' is a file-filtering string that can be used to match a selection of functional files for denoising (default: '/*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*' or ALL functional files in the fmriprep directory).
+* 'funcpointer' is a file-filtering string that can be used to match a selection of functional files for denoising (default: '/\*/\*/\*/\*space-MNI152NLin2009cAsym_preproc*.nii*' or ALL functional files in the fmriprep directory).
 
+# Output:
 
 
