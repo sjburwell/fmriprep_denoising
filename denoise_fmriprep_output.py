@@ -30,8 +30,9 @@ for opt, arg in options:
     elif opt in ('-a', '--atlas'):
         atlas = arg
     elif opt in ('-s', '--pipes'):
-        mypipesstr = arg
-        mypipes = arg.replace(' ','').replace('[','').replace(']','').split(',')
+        mypipesstr = arg.replace(' ','')
+        mypipes    = arg.replace(' ','').replace('[','').replace(']','').split(',')
+        print(mypipesstr)
     elif opt in ('-o', '--overwrite'):
         overwrite = arg
     elif opt in ('-c', '--cachedir'):
