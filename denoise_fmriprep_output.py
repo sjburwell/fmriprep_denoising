@@ -15,7 +15,7 @@ from nilearn.connectome import ConnectivityMeasure
 ### SET-UP and CHECK REQUIREMENTS
 prepdir = None
 atlas = None
-mypipes = ['24P+aCompCor+4GSR', '02P+AROMANonAgg', '03P+AROMANonAgg', '36P+SpkRegFD25']
+mypipes = ['24P+aCompCor+4GSR','02P+AROMANonAgg','03P+AROMANonAgg','36P+SpkRegFD25']
 cachedir = './tmpdir'
 overwrite = False
 funcpointer = '/*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*'
@@ -31,7 +31,7 @@ for opt, arg in options:
         atlas = arg
     elif opt in ('-s', '--pipes'):
         mypipesstr = arg
-        mypipes = arg.replace('[','').replace(']','').split(',')
+        mypipes = arg.replace(' ','').replace('[','').replace(']','').split(',')
     elif opt in ('-o', '--overwrite'):
         overwrite = arg
     elif opt in ('-c', '--cachedir'):
