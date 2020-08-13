@@ -39,4 +39,4 @@ In the above code, the arguements explained below:
 
 # Output:
 In the cache directory, the program denoise_fmriprep_output.py generates subject directories containing tab-separated variable (TSV) files where each column reflects a single time-series for a requested region of interest (ROIs), and each row reflects the time-points of the scanning session (i.e., TRs). For each subject and each denoising approach, there should be one TSV file. Additionally, at the root of the cache directory, there are two TSV files containing meta-data from preprocessing. 
-
+![alt text](https://github.com/sjburwell/fmriprep_denoising/blob/master/fmriprep_denoising_directory_output.JPG)
