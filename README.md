@@ -9,14 +9,14 @@ In Linux, first clone the GitHub repository into your local directory. Alternati
 git clone https://github.com/sjburwell/fmriprep_denoising.git
 ```
 
-Next, move into the directory containing the cloned repository's code and create an Anaconda environment containing the necessary Python dependencies using the environment.yml file. The name of the created environment will be called python363 because it uses Python version 3.6.3, but also requires additional packages.
+Next, move into the directory containing the cloned repository's code and create an Anaconda environment containing the necessary Python dependencies using the environment.yml file. The name of the created environment will be called python363 because it uses Python version 3.6.3, but also requires additional packages. Note that below, creating of the conda environment (i.e., conda env create...) will only need to be done once; after the environment is created, all that is needed is activation of the environment to use it (i.e., conda activate python363).
 ```linux
 cd fmriprep_denoising/
 conda env create -f environment.yml
 conda activate python363
 ```
 
-Next, run the denoising program. If you don't have AFNI and FSL neuroimaging toolboxes in your system path already, now is the time to load them. Below, they are added by the "load module" command, but things may be different on different machines. You can check whether these programs already exist in your path by using the "which fsl" or "which afni" command. 
+Next, run the denoising program. If you don't have AFNI and FSL neuroimaging toolboxes in your system path already, now is the time to load them. Below, they are added by the "load module" command, but things may be different on different machines. You can check whether these programs already exist in your path by using the "which fsl" or "which afni" command. Alternatively, you may need to install these programs from scratch, please see [here for AFNI](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/background_install/unix_tutorial/misc/install.afni.html) and [here for FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/Linux).
 ```linux
 module load afni fsl
 ```
@@ -35,7 +35,7 @@ In the above code, the arguements explained below:
 * 'prepdir' refers to the directory in which fmriprep output is saved
 * 'atlas' points to a Nifti file containing either a 3-dimensional "atlas" where voxels' integer values pertain to different regions of interest (e.g., 0=nonbrain, 1=hippocampus, 2=amygdala, etc.) or 4-dimensional series of "maps" where the 4th dimension contains statistical maps of activations (e.g., ICA weights)
 * 'pipes' refers to the denoising pipelines to be requested (see below for more info)
-* 'overwrite' is a booean which determines whether previous output(s) will be overwritten (default: False)
+* 'overwrite' is a boolean which determines whether previous output(s) will be overwritten (default: False)
 * 'cachedir' is the directory in which output files will be written (default: './tmpdir')
 * 'funcpointer' is a file-filtering string that can be used to match a selection of functional files for denoising (default: '/\*/\*/\*/\*space-MNI152NLin2009cAsym_preproc*.nii*' or ALL functional files in the fmriprep directory).
 
