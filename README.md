@@ -9,11 +9,11 @@ In Linux, first clone the GitHub repository into your local directory. Alternati
 git clone https://github.com/sjburwell/fmriprep_denoising.git
 ```
 
-Next, move into the directory containing the cloned repository's code and create an Anaconda environment containing the necessary Python dependencies using the environment.yml file. The name of the created environment will be called python363 because it uses Python version 3.6.3, but also requires additional packages. Note that below, creating of the conda environment (i.e., conda env create...) will only need to be done once; after the environment is created, all that is needed is activation of the environment to use it (i.e., conda activate python363).
+Next, move into the directory containing the cloned repository's code and create an Anaconda environment containing the necessary Python dependencies using the environment.yml file. The name of the created environment will be called ```linux fmriprep_denoising```. Note that below, creating of the conda environment (i.e., conda env create...) will only need to be done once; after the environment is created, all that is needed is activation of the environment to use it (i.e., conda activate fmriprep_denoising).
 ```linux
 cd fmriprep_denoising/
 conda env create -f environment.yml
-conda activate python363
+conda activate fmriprep_denoising
 ```
 
 Next, run the denoising program. If you don't have AFNI and FSL neuroimaging toolboxes in your system path already, now is the time to load them. Below, they are added by the "load module" command, but things may be different on different machines. You can check whether these programs already exist in your path by using the "which fsl" or "which afni" command. Alternatively, you may need to install these programs from scratch, please see [here for AFNI](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/background_install/unix_tutorial/misc/install.afni.html) and [here for FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/Linux).

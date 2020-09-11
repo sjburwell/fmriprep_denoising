@@ -6,7 +6,7 @@ import pandas as pd
 from scipy import signal
 from scipy.io import savemat
 from nibabel import load
-from nipype.utils import NUMPY_MMAP                 
+#from nipype.utils.config import NUMPY_MMAP                 
 from nipype.interfaces.afni import TProject
 from nilearn.input_data import NiftiLabelsMasker    # pip install nilearn==0.5.0a0
 from nilearn.input_data import NiftiMapsMasker
@@ -65,7 +65,8 @@ else:
 
 ##### END SETUP / CHECK
 
-if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
+#if len(load(atlas, mmap=NUMPY_MMAP).shape)==4:
+if len(load(atlas, mmap=True).shape)==4:
    atlasis4d = True
 else:
    atlasis4d = False
@@ -240,7 +241,7 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
    else:
       cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dtissue*.nii*')[0]
    curcache= cachedir + '/' + os.path.basename(curfunc)[0:11]
-   dim1,dim2,dim3,timepoints = load(curfunc, mmap=NUMPY_MMAP).shape
+   dim1,dim2,dim3,timepoints = load(curfunc, mmap=True).shape #NUMPY_MMAP).shape
    t = time.time()
    print ('Current subject (' + str(ii) + '): ' + curfunc)
 
