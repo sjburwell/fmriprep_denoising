@@ -31,7 +31,7 @@ for opt, arg in options:
         atlas = arg
     elif opt in ('-s', '--pipes'):
         mypipesstr = arg.replace(' ','')
-        mypipes    = arg.replace(' ','').replace('[','').replace(']','').split(',')
+        mypipes    = arg.replace(' ','').replace('[','').replace(']','').replace("'","").split(',')
         print(mypipesstr)
     elif opt in ('-o', '--overwrite'):
         overwrite = arg
