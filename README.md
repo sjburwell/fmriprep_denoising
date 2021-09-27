@@ -26,6 +26,7 @@ Finally, once AFNI and FSL are loaded, run the program...
 python denoise_fmriprep_output.py \
   --prepdir=/labs/burwellstudy/data/fmri/fmriprep-es2/fmriprep \
   --atlas=./atlases/Conn17f_atlas.nii \
+  --space=MNI152NLin2009cAsym
   --pipes=['24P+aCompCor+4GSR','03P+AROMANonAgg'] \
   --overwrite=True \
   --cachedir=./tmpdir \
@@ -34,6 +35,7 @@ python denoise_fmriprep_output.py \
 In the above code, the arguements explained below:
 * 'prepdir' refers to the directory in which fmriprep output is saved
 * 'atlas' points to a Nifti file containing either a 3-dimensional "atlas" where voxels' integer values pertain to different regions of interest (e.g., 0=nonbrain, 1=hippocampus, 2=amygdala, etc.) or 4-dimensional series of "maps" where the 4th dimension contains statistical maps of activations (e.g., ICA weights)
+* 'space' refers to the fmriprep output (e.g., MNI152NLin2009cAsym, T1w, etc.) on which to perform the denoising
 * 'pipes' refers to the denoising pipelines to be requested (see below for more info)
 * 'overwrite' is a boolean which determines whether previous output(s) will be overwritten (default: False)
 * 'cachedir' is the directory in which output files will be written (default: './tmpdir')

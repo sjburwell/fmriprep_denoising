@@ -15,10 +15,11 @@ from nilearn.connectome import ConnectivityMeasure
 ### SET-UP and CHECK REQUIREMENTS
 prepdir = None
 atlas = None
+space = 'MNI152NLin2009cAsym'
 mypipes = ['24P+aCompCor+4GSR','02P+AROMANonAgg','03P+AROMANonAgg','36P+SpkRegFD25']
 cachedir = './tmpdir'
 overwrite = False
-funcpointer = '/*/*/*/*space-MNI152NLin2009cAsym_preproc*.nii*'
+funcpointer = '/*/*/*/*space-' + space + '_preproc*.nii*'
 
 # add  highpass 
 
@@ -29,7 +30,9 @@ for opt, arg in options:
         prepdir = arg
     elif opt in ('-a', '--atlas'):
         atlas = arg
-    elif opt in ('-s', '--pipes'):
+    elif opt in ('-s', '--space'):
+        space = arg
+    elif opt in ('-i', '--pipes'):
         mypipesstr = arg.replace(' ','')
         mypipes    = arg.replace(' ','').replace('[','').replace(']','').replace("'","").split(',')
         print(mypipesstr)
@@ -232,14 +235,14 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
    curdir  = os.path.dirname(curfunc)
    curmask = glob.glob(curdir + '/*' +
                        curfunc.split('task-')[1].split('_')[0] + '*' +
-                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*space-MNI152NLin2009cAsym*brain*mask.nii*')[0]
+                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*space-' + space + '*brain*mask.nii*')[0]
    curconf = glob.glob(curdir + '/' + os.path.basename(curfunc)[0:11]+ '*' + 
                        curfunc.split('task-')[1].split('_')[0] + '*' + 
                        curfunc.split('run-')[1].split('_')[0]  + '*' + '*confounds*.tsv')[0]
-   if not glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dtissue*.nii*'):
-      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dseg*.nii*')[0]
+   if not glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dtissue*.nii*'):
+      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dseg*.nii*')[0]
    else:
-      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-MNI152NLin2009cAsym*dtissue*.nii*')[0]
+      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dtissue*.nii*')[0]
    curcache= cachedir + '/' + os.path.basename(curfunc)[0:11]
    dim1,dim2,dim3,timepoints = load(curfunc, mmap=True).shape #NUMPY_MMAP).shape
    t = time.time()
