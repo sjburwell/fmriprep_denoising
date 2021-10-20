@@ -14,41 +14,53 @@ from nilearn.connectome import ConnectivityMeasure
 
 ### SET-UP and CHECK REQUIREMENTS
 prepdir = None
-atlas = None
+atlas = './atlases/Schaefer400+HarvOxSubCortRL.nii'
 space = 'MNI152NLin2009cAsym'
 mypipes = ['24P+aCompCor+4GSR','02P+AROMANonAgg','03P+AROMANonAgg','36P+SpkRegFD25']
 cachedir = './tmpdir'
 overwrite = False
-funcpointer = '/*/*/*/*space-' + space + '_preproc*.nii*'
+funcpointer = '/*/*/func/*' + space + '_preproc*.nii*'
+delete3d = True
 
 # add  highpass 
 
-options, remainder = getopt.getopt(sys.argv[1:], "p:a:o:s:c:f:", ["prepdir=","atlas=","overwrite=","pipes=","cachedir=","funcpointer="])
+options, remainder = getopt.getopt(sys.argv[1:], "p:a:s:i:o:c:f:d:", ["prepdir=","atlas=","space=","pipes=","overwrite=","cachedir=","funcpointer=","delete3d="])
 
 for opt, arg in options:
+    print(opt)
     if opt in ('-p', '--prepdir'):
         prepdir = arg
     elif opt in ('-a', '--atlas'):
         atlas = arg
     elif opt in ('-s', '--space'):
         space = arg
+        print('Space: '+str(space))
     elif opt in ('-i', '--pipes'):
         mypipesstr = arg.replace(' ','')
         mypipes    = arg.replace(' ','').replace('[','').replace(']','').replace("'","").split(',')
         print(mypipesstr)
     elif opt in ('-o', '--overwrite'):
-        overwrite = arg
+        if arg=="True":
+             overwrite = True
+        else:
+             overwrite = False
     elif opt in ('-c', '--cachedir'):
         cachedir = arg
     elif opt in ('-f', '--funcpointer'):
         funcpointer = arg
+    elif opt in ('-d', '--delete3d'):
+        if arg=="True":
+             delete3d = True
+        else:
+             delete3d = False
+        print('Delete3d: '+str(delete3d))
 
 print('#  #  #  #  #  #    FMRIPREP Denoiser    #  #  #  #  #  #')
 print('FMRIPREP directory (--prepdir, str):                              '+prepdir)
 print('ATLAS file (--atlas, str to *.nii):                               '+atlas)
 print('PIPELINES (--pipes, list):                                        '+mypipesstr)
 print('WRITE directory (--cachedir, str)              :                  '+cachedir)
-print('OVERWRITE existing (--overwrite, bool)?                           '+overwrite)
+print('OVERWRITE existing (--overwrite, bool)?                           '+str(overwrite))
 print('FUNCTIONAL file pointer within prepdir root (--funcpointer, str): '+funcpointer)
 
 if not os.path.exists(prepdir):
@@ -233,16 +245,30 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
    #get stuff for current case
    curfunc = funcdat[ii]
    curdir  = os.path.dirname(curfunc)
-   curmask = glob.glob(curdir + '/*' +
-                       curfunc.split('task-')[1].split('_')[0] + '*' +
-                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*space-' + space + '*brain*mask.nii*')[0]
-   curconf = glob.glob(curdir + '/' + os.path.basename(curfunc)[0:11]+ '*' + 
-                       curfunc.split('task-')[1].split('_')[0] + '*' + 
-                       curfunc.split('run-')[1].split('_')[0]  + '*' + '*confounds*.tsv')[0]
-   if not glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dtissue*.nii*'):
-      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dseg*.nii*')[0]
-   else:
-      cursegm = glob.glob(curdir.split('/ses-')[0]+'/anat/*space-' + space + '*dtissue*.nii*')[0]
+
+   # Get brainmask file
+   try:
+        curmask = glob.glob(curdir + '/*' +
+                            curfunc.split('task-')[1].split('_')[0] + '*' +
+                            curfunc.split('run-')[1].split('_')[0]  + '*' + '*space-' + space + '*brain*mask.nii*')[0]
+   except:
+        curmask = glob.glob(curdir.split('ses')[0] + '/**/*' + space +  '_brain*mask*.nii*', recursive = True)[0]
+
+   # Get confound file
+   try:
+        curconf = glob.glob(curdir + '/' + os.path.basename(curfunc)[0:11]+ '*' + 
+                            curfunc.split('task-')[1].split('_')[0] + '*' + 
+                            curfunc.split('run-')[1].split('_')[0]  + '*' + '*confounds*.tsv')[0]
+   except:
+        curconf = glob.glob(curdir.split('ses')[0] + '/**/sub*confounds*.tsv', recursive = True)[0]
+
+
+   # Get GM, WM, CSF segments
+   try:
+        cursegm = glob.glob(curdir.split('ses')[0] + '/**/sub*'+ space + '_dtissue*.nii*', recursive = True)[0]
+   except:
+        cursegm = glob.glob(curdir.split('ses')[0] + '/**/sub*'+ space + '_dseg*.nii*', recursive = True)[0]
+
    curcache= cachedir + '/' + os.path.basename(curfunc)[0:11]
    dim1,dim2,dim3,timepoints = load(curfunc, mmap=True).shape #NUMPY_MMAP).shape
    t = time.time()
@@ -279,32 +305,64 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
      # also, the functional file-derived signals should come from the existing AROMA.nii.gz, this section of code will
      # replace the contents of existing 'WhiteMatter', 'CSF', 'GlobalSignal' with new contents from the AROMA cleaned file
      nAROMAComps = 0
-     tmpAROMA    = (curdir + '/tmpAROMA_' +
-                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
-                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '.nii.gz')
-     tmpAROMAconf= (curdir + '/tmpAROMA_' +
-                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
-                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_confounds.tsv')
-     tmpAROMAwm  = (curcache + '/tmpAROMA_' +
-                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
-                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_wm.nii.gz')
-     tmpAROMAcsf = (curcache + '/tmpAROMA_' +
-                      'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
-                      'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_csf.nii.gz')
+     try:
+        tmpAROMA    = (curdir + '/tmpAROMA_' +
+                         'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                         'run-'  + curfunc.split('run-')[1].split('_')[0]  + '.nii.gz')
+     except:
+        tmpAROMA    = curdir + '/tmpAROMA.nii.gz'
+
+
+     try:
+        tmpAROMAconf= (curdir + '/tmpAROMA_' +
+                         'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                         'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_confounds.tsv')
+     except:
+        tmpAROMAconf= curdir + '/tmpAROMA_confounds.tsv' 
+
+
+     try:
+        tmpAROMAwm  = (curcache + '/tmpAROMA_' +
+                         'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                         'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_wm.nii.gz')
+     except:
+        tmpAROMAwm  = curcache + '/tmpAROMA_wm.nii.gz'
+
+
+     try:
+        tmpAROMAcsf = (curcache + '/tmpAROMA_' +
+                         'task-' + curfunc.split('task-')[1].split('_')[0] + '_' +
+                         'run-'  + curfunc.split('run-')[1].split('_')[0]  + '_csf.nii.gz')
+     except:
+        tmpAROMAcsf = curcache + '/tmpAROMA_csv.nii.gz'
+
+
+     try: 
+        AROMAnoiseICs = glob.glob(curdir + '/*' +
+                           curfunc.split('task-')[1].split('_')[0] + '*' +
+                           curfunc.split('run-')[1].split('_')[0]  + '*' + '*AROMAnoiseICs.csv')
+     except:
+        AROMAnoiseICs = glob.glob(curdir.split('ses')[0] + '/**/*AROMAnoiseIC*', recursive = True)[0]
+
+
+     try:
+        MELODICtsv = glob.glob(curdir + '/*'+
+                               curfunc.split('task-')[1].split('_')[0] + '*' +
+                               curfunc.split('run-')[1].split('_')[0]  + '*' + '*MELODIC*.tsv')[0]
+     except:
+        MELODICtsv = glob.glob(curdir.split('ses')[0] + '/**/*MELODIC*tsv', recursive = True)[0]
+
      if usearoma:
         from nipype.interfaces.fsl.utils import FilterRegressor
-        nAROMAComps = nAROMAComps + len(np.loadtxt(glob.glob(curdir + '/*'+
-                            curfunc.split('task-')[1].split('_')[0] + '*' +
-                            curfunc.split('run-')[1].split('_')[0]  + '*' + '*AROMAnoiseICs.csv')[0],delimiter=',').astype('int'))
+
+        nAROMAComps = nAROMAComps + len(np.loadtxt(AROMAnoiseICs,delimiter=',').astype('int'))
+
+
         if (not os.path.isfile(outfile) or overwrite) or (not os.path.isfile(tmpAROMA) and overwrite):
-           FilterRegressor(design_file=                   glob.glob(curdir + '/*'+
-                                   curfunc.split('task-')[1].split('_')[0] + '*' +
-                                   curfunc.split('run-')[1].split('_')[0]  + '*' + '*MELODIC*.tsv')[0],
-                           filter_columns=list(np.loadtxt(glob.glob(curdir + '/*'+
-                                   curfunc.split('task-')[1].split('_')[0] + '*' +
-                                   curfunc.split('run-')[1].split('_')[0]  + '*' + '*AROMAnoiseICs.csv')[0],delimiter=',').astype('int')),
+           FilterRegressor(design_file=MELODICtsv,
+                           filter_columns=list(np.loadtxt(AROMAnoiseICs,delimiter=',').astype('int')),
                            in_file=curfunc,
-                           mask=curmask,
+                           #mask=curmask,
                            out_file=tmpAROMA).run()
         if not os.path.isfile(tmpAROMAconf):
            if not os.path.isfile(tmpAROMAwm) or not os.path.isfile(tmpAROMAcsf):
@@ -366,22 +424,24 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
      #do the regression
      errts_fn = curcache + "/errts_3dtproject" + "_Proc-" + pipelines[jj].outid + "_ROI-" + os.path.basename(atlas)[0:-4] + ".nii"
      if (not os.path.isfile(outfile) or overwrite) and (NoiseReg.shape[1]/NoiseReg.shape[0] < .90):
-        if os.path.isfile(errts_fn):
+        if (os.path.isfile(errts_fn)) and (delete3d):
+           print("Removing to save disk space: "+errts_fn)
            os.remove(errts_fn)
         tproject = TProject()
         if usearoma: tproject.inputs.in_file = tmpAROMA
         else:        tproject.inputs.in_file = curfunc
         tproject.inputs.polort = 2 # 0th, 1st, 2nd-order terms
-        if usearoma:
-           tproject.inputs.automask = True
-        else: 
-           tproject.inputs.automask = False
-           tproject.inputs.mask = curmask
+
+        tproject.inputs.automask = True
+        #if usearoma:
+        #   tproject.inputs.automask = True
+        #else: 
+        #   tproject.inputs.automask = False  #caused issues for T1w
+        #   tproject.inputs.mask = curmask
+
         tproject.inputs.bandpass= tuple(bandpass)
         if NoiseReg.shape[1]>0:
            tproject.inputs.ort     = noise_fn 
-        #tproject.inputs.censor  = curcache + "/SpikeReg.txt"
-        #tproject.inputs.cenmode = 'NTRP'
         tproject.inputs.out_file= errts_fn   
         tproject.run()
 
@@ -395,9 +455,22 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
      #store info into dataframe w/ 
      idlist[ii,jj]      = os.path.basename(curfunc).split('_')[0]
      atlaslist[ii,jj]   = atlas
-     ses[ii,jj]         = curfunc.split('ses-')[1].split('/')[0]  
-     task[ii,jj]        = curfunc.split('task-')[1].split('_')[0]    
-     run[ii,jj]         = curfunc.split('run-')[1].split('_')[0]     
+     try:
+        ses[ii,jj]      = curfunc.split('ses-')[1].split('/')[0]  
+     except:
+        ses[ii,jj]      = 'n/a'
+     try:
+        task[ii,jj]     = curfunc.split('task-')[1].split('_')[0]
+     except:
+        ses[ii,jj]      = 'n/a'
+     try:
+        task[ii,jj]     = curfunc.split('task-')[1].split('_')[0]    
+     except:
+        task[ii,jj]     = 'n/a'
+     try:
+        run[ii,jj]      = curfunc.split('run-')[1].split('_')[0]
+     except:
+        run[ii,jj]      = 'n/a'
      ntr[ii,jj]         = float(timepoints)
      fdthr[ii,jj]       = float(pipelines[jj].fdthr)
      dvthr[ii,jj]       = float(pipelines[jj].dvrthr)
@@ -410,8 +483,11 @@ for ii in range(0,len(funcdat)): #range(0,len(funcdat)):
      meddv[ii,jj]       = float(np.median(confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
      maxdv[ii,jj]       = float(np.max( confounds.filter(['stdDVARS','std_dvars'])[1:-1]))
 
-     if os.path.isfile(errts_fn):   os.remove(errts_fn)
-     if os.path.isfile(noise_fn):   os.remove(noise_fn)
+     if (os.path.isfile(errts_fn)) and (delete3d):
+          print("Removing to save disk space: "+errts_fn)
+          os.remove(errts_fn)
+     if os.path.isfile(noise_fn):
+          os.remove(noise_fn)
 
    if os.path.isfile(tmpAROMA   ):  os.remove(tmpAROMA)
    if os.path.isfile(tmpAROMAwm ):  os.remove(tmpAROMAwm)
